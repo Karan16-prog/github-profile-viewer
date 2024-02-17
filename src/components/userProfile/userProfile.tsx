@@ -3,6 +3,8 @@ import { githubAPI } from "../../constants";
 import { GitHubUserProfile, GitHubUserRaw, GithubRepo } from "../../interface";
 import RepoTable from "../repoTable/repoTable";
 import loader from "../../assets/loader.gif";
+import { ToastContainer, Bounce, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function UserProfile({ username }: { username: string }) {
   const [userData, setUserData] = useState<GitHubUserProfile | null>(null);
@@ -29,6 +31,10 @@ function UserProfile({ username }: { username: string }) {
         ...prevErrors,
         error instanceof Error ? error.message : "Unknown error",
       ]);
+
+      triggerErrorAlert(
+        error instanceof Error ? error.message : "Unknown error"
+      )();
     }
   }, [username]);
 
@@ -60,10 +66,34 @@ function UserProfile({ username }: { username: string }) {
           ...prevErrors,
           error instanceof Error ? error.message : "Unknown error",
         ]);
+
+        triggerErrorAlert(
+          error instanceof Error ? error.message : "Unknown error"
+        )();
       }
     },
     [username]
   );
+
+  let errorAlertExecuted = false;
+  const triggerErrorAlert = (errorMessage: string) => {
+    return () => {
+      if (!errorAlertExecuted) {
+        toast.error(errorMessage, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+        // errorAlertExecuted = true;
+      }
+    };
+  };
 
   useEffect(() => {
     fetchUserData();
@@ -78,6 +108,7 @@ function UserProfile({ username }: { username: string }) {
       </div>
     );
   }
+
   return (
     <>
       {errors.length === 0 ? (
@@ -105,15 +136,31 @@ function UserProfile({ username }: { username: string }) {
           </div>
         </div>
       ) : (
-        <div className="error-container">
-          <p>
-            "Oops! Something went wrong. We're sorry, but it looks like there
-            was an error processing your request. Please try again later.
-          </p>
-          <div>
-            <a href="/">&nbsp; Go Back</a>
+        <>
+          <div className="error-container">
+            <p>
+              "Oops! Something went wrong. We're sorry, but it looks like there
+              was an error processing your request. Please try again later.
+            </p>
+            <div>
+              <a href="/">&nbsp; Go Back</a>
+            </div>
           </div>
-        </div>
+
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            transition={Bounce}
+            theme="dark"
+          />
+        </>
       )}
     </>
   );
