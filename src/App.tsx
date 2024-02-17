@@ -1,4 +1,3 @@
-import "./App.css";
 import Placeholder from "./components/placeholder/placeholder";
 import UserProfile from "./components/userProfile/userProfile";
 

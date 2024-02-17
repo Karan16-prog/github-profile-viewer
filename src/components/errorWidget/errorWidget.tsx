@@ -1,7 +1,6 @@
 import { ToastContainer, Bounce } from "react-toastify";
 
 const ErrorWidget = ({ userNotFound }: { userNotFound: boolean }) => {
-  console.log(userNotFound);
   return (
     <>
       <div className="error-container">
