@@ -4,10 +4,17 @@ import UserProfile from "./components/userProfile/userProfile";
 
 function App() {
   const urlParams = new URLSearchParams(window.location.search);
+  let currentURL = window.location.href;
   const username = urlParams.get("username");
 
   return (
-    <>{!username ? <Placeholder /> : <UserProfile username={username} />}</>
+    <>
+      {!username ? (
+        <Placeholder url={currentURL} />
+      ) : (
+        <UserProfile username={username} />
+      )}
+    </>
   );
 }
 

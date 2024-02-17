@@ -1,4 +1,5 @@
-const Placeholder = () => {
+const Placeholder = ({ url }: { url: string }) => {
+  const navigateTo = `${url}profile?username=Karan16-prog`;
   return (
     <div className="placeholder-container">
       <div style={{ textAlign: "center" }}>
@@ -8,11 +9,8 @@ const Placeholder = () => {
         </div>
         <div>
           Format:
-          <a
-            style={{ textDecoration: "none" }}
-            href="http://localhost:5173/profile?username=Karan16-prog"
-          >
-            &nbsp; "http://localhost:5173/profile?username=Karan16-prog"
+          <a style={{ textDecoration: "none" }} href={navigateTo}>
+            &nbsp; {navigateTo}
           </a>
         </div>
       </div>
