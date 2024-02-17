@@ -1,5 +1,5 @@
 const Placeholder = ({ url }: { url: string }) => {
-  const navigateTo = `${url}profile?username=Karan16-prog`;
+  const navigateTo = `${url}profile/Karan16-prog`;
   return (
     <div className="placeholder-container">
       <div style={{ textAlign: "center" }}>
