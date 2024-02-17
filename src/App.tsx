@@ -1,5 +1,4 @@
 import "./App.css";
-import Navbar from "./components/navbar/navbar";
 import Placeholder from "./components/placeholder/placeholder";
 import UserProfile from "./components/userProfile/userProfile";
 
@@ -8,10 +7,7 @@ function App() {
   const username = urlParams.get("username");
 
   return (
-    <>
-      <Navbar />
-      {!username ? <Placeholder /> : <UserProfile username={username} />}
-    </>
+    <>{!username ? <Placeholder /> : <UserProfile username={username} />}</>
   );
 }
 

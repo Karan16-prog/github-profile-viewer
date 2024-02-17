@@ -11,6 +11,7 @@ export interface GithubRepo {
   description: string;
   topics: string[];
   id: string;
+  node_id: string;
 }
 
 export interface GitHubUserRaw {

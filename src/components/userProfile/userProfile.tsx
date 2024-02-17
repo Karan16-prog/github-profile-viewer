@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { githubAPI } from "../../constants";
 import { GitHubUserProfile, GitHubUserRaw, GithubRepo } from "../../interface";
 import RepoTable from "../repoTable/repoTable";
+import loader from "../../assets/loader.gif";
 
 function UserProfile({ username }: { username: string }) {
   const [userData, setUserData] = useState<GitHubUserProfile | null>(null);
   const [repositories, setRepositories] = useState<GithubRepo[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await fetch(`${githubAPI}${username}`);
       if (!response.ok) {
@@ -29,65 +30,92 @@ function UserProfile({ username }: { username: string }) {
         error instanceof Error ? error.message : "Unknown error",
       ]);
     }
-  };
+  }, [username]);
 
-  const fetchRepositories = async <T extends GithubRepo>(
-    pageNumber: number = 1,
-    pageCount: number = 10
-  ) => {
-    try {
-      // repos?per_page=10&page=1
-      const response = await fetch(
-        `${githubAPI}${username}/repos?per_page=${pageCount}&page=${pageNumber}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch repositories");
+  const fetchRepositories = useCallback(
+    async <T extends GithubRepo>(
+      pageNumber: number = 1,
+      pageCount: number = 10
+    ) => {
+      try {
+        const response = await fetch(
+          `${githubAPI}${username}/repos?per_page=${pageCount}&page=${pageNumber}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch repositories");
+        }
+        const data: T[] = await response.json();
+
+        const massagedData: GithubRepo[] = data.map((repo, idx) => ({
+          id: `${pageNumber == 1 ? idx + 1 : idx + 1 + (pageNumber - 1) * 10}`,
+          name: repo?.name,
+          description: repo?.description || "",
+          topics: repo?.topics || [],
+          node_id: repo?.node_id,
+        }));
+        setRepositories(massagedData);
+      } catch (error) {
+        console.error("Error fetching repositories:", error);
+        setErrors((prevErrors) => [
+          ...prevErrors,
+          error instanceof Error ? error.message : "Unknown error",
+        ]);
       }
-      const data: T[] = await response.json();
-
-      const simplifiedDat: GithubRepo[] = data.map((repo) => ({
-        id: repo?.id,
-        name: repo?.name,
-        description: repo?.description || "", // Handling null description
-        topics: repo?.topics || [], // Handling undefined topics
-      }));
-      setRepositories(simplifiedDat);
-    } catch (error) {
-      console.error("Error fetching repositories:", error);
-      setErrors((prevErrors) => [
-        ...prevErrors,
-        error instanceof Error ? error.message : "Unknown error",
-      ]);
-    }
-  };
+    },
+    [username]
+  );
 
   useEffect(() => {
     fetchUserData();
     fetchRepositories();
-  }, [username]);
-
-  useEffect(() => {
-    console.log(repositories);
-  }, [repositories]);
+  }, [fetchUserData, fetchRepositories]);
 
   if (!userData && errors.length === 0) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <img src={loader} alt="Loading..." />
+        <h4>One moment please...</h4>
+      </div>
+    );
   }
   return (
-    <div>
-      <div>
-        <h2>{userData?.username}</h2>
-        <p>Bio: {userData?.bio}</p>
-        <p>Avatar: {userData?.avatar_url}</p>
-        <h3>Repositories:{userData?.public_repos}</h3>
-      </div>
-      <div>
-        <RepoTable
-          repoData={repositories}
-          repoCount={userData?.public_repos ?? 0}
-        />
-      </div>
-    </div>
+    <>
+      {errors.length === 0 ? (
+        <div className="profile-container">
+          <div className="profile-detail">
+            <div>
+              <img
+                className="avatar"
+                src={userData?.avatar_url}
+                alt="User avatar"
+              />
+            </div>
+            <div>
+              <h2>{userData?.username}</h2>
+              <p>{userData?.bio}</p>
+              <h3>{userData?.public_repos} public repos!</h3>
+            </div>
+          </div>
+          <div>
+            <RepoTable
+              repoData={repositories}
+              repoCount={userData?.public_repos ?? 0}
+              fetchPage={fetchRepositories}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="error-container">
+          <p>
+            "Oops! Something went wrong. We're sorry, but it looks like there
+            was an error processing your request. Please try again later.
+          </p>
+          <div>
+            <a href="/">&nbsp; Go Back</a>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
