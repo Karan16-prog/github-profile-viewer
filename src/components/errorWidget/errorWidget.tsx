@@ -1,12 +1,16 @@
 import { ToastContainer, Bounce } from "react-toastify";
 
-const ErrorWidget = () => {
+const ErrorWidget = ({ userNotFound }: { userNotFound: boolean }) => {
+  console.log(userNotFound);
   return (
     <>
       <div className="error-container">
         <p>
-          "Oops! Something went wrong. We're sorry, but it looks like there was
-          an error processing your request. Please try again later.
+          {!userNotFound
+            ? "Oops! User does not exist!"
+            : `Oops! Something went wrong. 
+            We're sorry, but it looks like there was an error processing your request. 
+            Please try again later.`}
         </p>
         <div>
           <a href="/">&nbsp; Go Back</a>

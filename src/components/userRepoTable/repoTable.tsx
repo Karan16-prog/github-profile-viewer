@@ -21,7 +21,7 @@ const RepoTable = ({
   const pageCount = Math.ceil(repoCount / itemsPerPage);
 
   const handlePageClick = (event: EventParameter) => {
-    console.log(`User requested page number ${event.selected}`);
+    // callback to fetch selected page
     fetchPage(event.selected + 1, itemsPerPage);
   };
 

@@ -11,14 +11,20 @@ function UserProfile({ username }: { username: string }) {
   const [userData, setUserData] = useState<GitHubUserProfile | null>(null);
   const [repositories, setRepositories] = useState<GithubRepo[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const [userExists, setUserExists] = useState(true);
 
-  const fetchUserData = useCallback(async <T extends GitHubUserProfile>() => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await fetch(`${githubAPI}${username}`);
+      const data = await response.json();
+      if (data?.message === "Not Found") {
+        setUserExists(false);
+        // throw new Error("User does not exist!");
+      }
+
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
-      const data: T = await response.json();
       setUserData({
         login: data?.login,
         bio: data?.bio ?? "",
@@ -26,7 +32,6 @@ function UserProfile({ username }: { username: string }) {
         public_repos: data?.public_repos,
       });
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setErrors((prevErrors) => [
         ...prevErrors,
         error instanceof Error ? error.message : "Unknown error",
@@ -61,7 +66,6 @@ function UserProfile({ username }: { username: string }) {
         }));
         setRepositories(massagedData);
       } catch (error) {
-        console.error("Error fetching repositories:", error);
         setErrors((prevErrors) => [
           ...prevErrors,
           error instanceof Error ? error.message : "Unknown error",
@@ -76,6 +80,7 @@ function UserProfile({ username }: { username: string }) {
   );
 
   // trigger error alert
+
   let errorAlertExecuted = false;
   const triggerErrorAlert = (errorMessage: string) => {
     return () => {
@@ -126,7 +131,7 @@ function UserProfile({ username }: { username: string }) {
           />
         </div>
       ) : (
-        <ErrorWidget />
+        <ErrorWidget userNotFound={userExists} />
       )}
     </>
   );
