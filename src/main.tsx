@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     errorElement: <PageDoesNotExist />,
   },
   {
-    path: "/profile/:username",
+    path: "/:username",
     element: <UserProfile />,
     errorElement: <PageDoesNotExist />,
   },
