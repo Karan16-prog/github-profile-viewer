@@ -6,8 +6,11 @@ import { githubAPI } from "../../constants";
 import { GitHubUserProfile, GithubRepo } from "../../interface";
 import ErrorWidget from "../errorWidget/errorWidget";
 import RepoTable from "../userRepoTable/repoTable";
+import { useParams } from "react-router-dom";
 
-function UserProfile({ username }: { username: string }) {
+function UserProfile() {
+  const { username } = useParams();
+
   const [userData, setUserData] = useState<GitHubUserProfile | null>(null);
   const [repositories, setRepositories] = useState<GithubRepo[]>([]);
   const [errors, setErrors] = useState<string[]>([]);

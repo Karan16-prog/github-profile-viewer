@@ -110,7 +110,17 @@ body{
   flex-direction: column;
 
 }
+
 a{
   text-decoration: none;
 }
 
+
+.error-boundary{
+  height: 100vh;
+  width: 100%;
+  padding: 30px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
