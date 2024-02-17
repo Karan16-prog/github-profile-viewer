@@ -10,10 +10,7 @@ const RepoTable = ({
 }: {
   repoData: GithubRepo[];
   repoCount: number;
-  _fetchPage: <T extends GithubRepo>(
-    pageNumber?: number,
-    pageCount?: number
-  ) => Promise<void>;
+  _fetchPage: (pageNumber?: number, pageCount?: number) => Promise<void>;
 }) => {
   const itemsPerPage = 10;
 
