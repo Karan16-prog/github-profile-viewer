@@ -79,9 +79,9 @@ function UserProfile({ username }: { username: string }) {
     [username]
   );
 
-  // trigger error alert
-
   let errorAlertExecuted = false;
+
+  // trigger error alert
   const triggerErrorAlert = (errorMessage: string) => {
     return () => {
       if (!errorAlertExecuted) {
@@ -127,7 +127,7 @@ function UserProfile({ username }: { username: string }) {
           <RepoTable
             repoData={repositories}
             repoCount={userData?.public_repos ?? 0}
-            fetchPage={fetchRepositories}
+            _fetchPage={fetchRepositories}
           />
         </div>
       ) : (

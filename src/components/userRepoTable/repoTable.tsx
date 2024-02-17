@@ -6,11 +6,11 @@ import { GithubRepo } from "../../interface";
 const RepoTable = ({
   repoData,
   repoCount,
-  fetchPage,
+  _fetchPage,
 }: {
   repoData: GithubRepo[];
   repoCount: number;
-  fetchPage: <T extends GithubRepo>(
+  _fetchPage: <T extends GithubRepo>(
     pageNumber?: number,
     pageCount?: number
   ) => Promise<void>;
@@ -22,7 +22,7 @@ const RepoTable = ({
 
   const handlePageClick = (event: EventParameter) => {
     // callback to fetch selected page
-    fetchPage(event.selected + 1, itemsPerPage);
+    _fetchPage(event.selected + 1, itemsPerPage);
   };
 
   return (
