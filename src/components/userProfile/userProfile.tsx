@@ -1,29 +1,29 @@
-import { useState, useEffect, useCallback } from "react";
-import { githubAPI } from "../../constants";
-import { GitHubUserProfile, GitHubUserRaw, GithubRepo } from "../../interface";
-import RepoTable from "../repoTable/repoTable";
-import loader from "../../assets/loader.gif";
-import { ToastContainer, Bounce, toast } from "react-toastify";
+import { useCallback, useEffect, useState } from "react";
+import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import loader from "../../assets/loader.gif";
+import { githubAPI } from "../../constants";
+import { GitHubUserProfile, GithubRepo } from "../../interface";
+import ErrorWidget from "../errorWidget/errorWidget";
+import RepoTable from "../userRepoTable/repoTable";
 
 function UserProfile({ username }: { username: string }) {
   const [userData, setUserData] = useState<GitHubUserProfile | null>(null);
   const [repositories, setRepositories] = useState<GithubRepo[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const fetchUserData = useCallback(async () => {
+  const fetchUserData = useCallback(async <T extends GitHubUserProfile>() => {
     try {
       const response = await fetch(`${githubAPI}${username}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
-      const data: GitHubUserRaw = await response.json();
+      const data: T = await response.json();
       setUserData({
-        username: data?.login,
+        login: data?.login,
         bio: data?.bio ?? "",
         avatar_url: data?.avatar_url,
         public_repos: data?.public_repos,
-        private_profile: data?.type === "User" ? false : true,
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -75,6 +75,7 @@ function UserProfile({ username }: { username: string }) {
     [username]
   );
 
+  // trigger error alert
   let errorAlertExecuted = false;
   const triggerErrorAlert = (errorMessage: string) => {
     return () => {
@@ -97,8 +98,11 @@ function UserProfile({ username }: { username: string }) {
 
   useEffect(() => {
     fetchUserData();
+  }, [fetchUserData]);
+
+  useEffect(() => {
     fetchRepositories();
-  }, [fetchUserData, fetchRepositories]);
+  }, [fetchRepositories]);
 
   if (!userData && errors.length === 0) {
     return (
@@ -113,57 +117,34 @@ function UserProfile({ username }: { username: string }) {
     <>
       {errors.length === 0 ? (
         <div className="profile-container">
-          <div className="profile-detail">
-            <div>
-              <img
-                className="avatar"
-                src={userData?.avatar_url}
-                alt="User avatar"
-              />
-            </div>
-            <div>
-              <h2>{userData?.username}</h2>
-              <p>{userData?.bio}</p>
-              <h3>{userData?.public_repos} public repos!</h3>
-            </div>
-          </div>
-          <div>
-            <RepoTable
-              repoData={repositories}
-              repoCount={userData?.public_repos ?? 0}
-              fetchPage={fetchRepositories}
-            />
-          </div>
+          <UserDetails userData={userData} />
+
+          <RepoTable
+            repoData={repositories}
+            repoCount={userData?.public_repos ?? 0}
+            fetchPage={fetchRepositories}
+          />
         </div>
       ) : (
-        <>
-          <div className="error-container">
-            <p>
-              "Oops! Something went wrong. We're sorry, but it looks like there
-              was an error processing your request. Please try again later.
-            </p>
-            <div>
-              <a href="/">&nbsp; Go Back</a>
-            </div>
-          </div>
-
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            transition={Bounce}
-            theme="dark"
-          />
-        </>
+        <ErrorWidget />
       )}
     </>
   );
 }
+
+const UserDetails = ({ userData }: { userData: GitHubUserProfile | null }) => {
+  return (
+    <div className="profile-detail">
+      <div>
+        <img className="avatar" src={userData?.avatar_url} alt="User avatar" />
+      </div>
+      <div>
+        <h2>{userData?.login}</h2>
+        <p>{userData?.bio}</p>
+        <h3>{userData?.public_repos} public repos!</h3>
+      </div>
+    </div>
+  );
+};
 
 export default UserProfile;

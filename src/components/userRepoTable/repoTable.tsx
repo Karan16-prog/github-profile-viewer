@@ -16,15 +16,20 @@ const RepoTable = ({
   ) => Promise<void>;
 }) => {
   const itemsPerPage = 10;
+
+  // total no of pages
   const pageCount = Math.ceil(repoCount / itemsPerPage);
+
   const handlePageClick = (event: EventParameter) => {
     console.log(`User requested page number ${event.selected}`);
-    fetchPage(event.selected + 1, 10);
+    fetchPage(event.selected + 1, itemsPerPage);
   };
 
   return (
     <>
       <DataGrid className="data-grid" columns={columns} rows={repoData} />
+
+      {/* pagination component */}
       <ReactPaginate
         nextLabel=">"
         onPageChange={handlePageClick}
@@ -50,10 +55,12 @@ const RepoTable = ({
 
 export default RepoTable;
 
+// custom cell for topics array
 const TopicCell = ({ row }: { row: any }) => {
   return <div>{row.topics.join(", ")}</div>;
 };
 
+// column schema
 const columns = [
   { key: "id", name: "ID", width: 80 },
   { key: "name", name: "Name", resizable: true },
