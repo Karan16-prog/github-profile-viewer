@@ -6,6 +6,13 @@ export interface GitHubUserProfile {
   private_profile: boolean;
 }
 
+export interface GithubRepo {
+  name: string;
+  description: string;
+  topics: string[];
+  id: string;
+}
+
 export interface GitHubUserRaw {
   login: string;
   id: number;
